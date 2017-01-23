@@ -1,0 +1,24 @@
+{
+  "name": "canary-perch",
+  "version": "0.0.1",
+  "description": "Elasticsearch Academic paper fact extraction - backend for canary",
+  "main": "index.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "standard": "^8.6.0"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tarrow/canary-perch.git"
+  },
+  "author": "Thomas Arrow",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tarrow/canary-perch/issues"
+  },
+  "homepage": "https://github.com/tarrow/canary-perch#readme"
+}

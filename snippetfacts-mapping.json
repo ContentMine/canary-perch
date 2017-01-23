@@ -1,0 +1,23 @@
+{}
+"mappings": {
+  "snippet": {
+    "properties": {
+      "dictionaryID": {
+        "type": "string"
+      },
+      "documentID": {
+        "type": "string"
+      },
+      "post": {
+        "type": "string"
+      },
+      "prefix": {
+        "type": "string"
+      },
+      "term": {
+        "type": "string"
+      }
+    }
+  }
+}
+}

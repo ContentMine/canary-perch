@@ -1,8 +1,8 @@
 var recursive = require('recursive-readdir')
 var elasticsearch = require('elasticsearch')
-import * as _ from 'lodash'
+var _ = 'lodash'
 var path = require('path')
-import * as fs from 'graceful-fs'
+var fs = 'graceful-fs'
 var AgentKeepAlive = require('agentkeepalive')
 var Elasticdump = require('elasticdump')
 

@@ -145,7 +145,7 @@ var deleteFactIndex = function (err, hosts, cb) {
   if (err) throw err
   var client = ESClient(hosts)
   // Use dummy callback to wedge in hosts
-  var dummyCallback = function (err, cb) {
+  var dummyCallback = function (err) {
     if ((err) && !(err.status === 404)) throw err
     cb(undefined, hosts, cb)
   }
@@ -196,12 +196,12 @@ var deleteMetadataIndex = function (err, hosts, cb) {
   if (err) throw err
   var client = ESClient(hosts)
   // dummy callbackto wedge in hosts
-  var dummyCallback = function (err, cb) {
+  var dummyCallback = function (err) {
     if (err) throw err
     if (Meteor) {
-      Meteor.bindEnvironment(() => cb(err, hosts, cb))
+      Meteor.bindEnvironment(() => cb(err, hosts))
     }
-    cb(err, hosts, cb)
+    cb(err, hosts)
   }
   client.indices.delete({
     index: 'metadata'

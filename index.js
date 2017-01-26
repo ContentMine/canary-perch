@@ -161,20 +161,22 @@ var mapFactIndex = function (err, hosts, cb) {
   }
   var client = ESClient(hosts)
   client.indices.create({
-    'mapping': {
-      'snippet': {
-        'properties': {
-          'cprojectID': {'type': 'string'},
-          'documentID': {'type': 'string'},
-          'identifiers': {
-            'properties': {
-              'contentmine': {'type': 'string'},
-              'opentrials': {'type': 'string'}
-            }
-          },
-          'post': {'type': 'string'},
-          'prefix': {'type': 'string'},
-          'term': {'type': 'string'}
+    body: {
+      'mappings': {
+        'snippet': {
+          'properties': {
+            'cprojectID': {'type': 'string'},
+            'documentID': {'type': 'string'},
+            'identifiers': {
+              'properties': {
+                'contentmine': {'type': 'string'},
+                'opentrials': {'type': 'string'}
+              }
+            },
+            'post': {'type': 'string'},
+            'prefix': {'type': 'string'},
+            'term': {'type': 'string'}
+          }
         }
       }
     },

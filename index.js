@@ -146,8 +146,8 @@ var deleteFactIndex = function (err, hosts, cb) {
   var client = ESClient(hosts)
   // Use dummy callback to wedge in hosts
   var dummyCallback = function (err, cb) {
-    if (err) throw err
-    cb(err, hosts, cb)
+    if ((err) && !(err.status === 404)) throw err
+    cb(undefined, hosts, cb)
   }
   client.indices.delete({
     index: 'facts'

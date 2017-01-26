@@ -161,7 +161,7 @@ var mapFactIndex = function (err, hosts, cb) {
   }
   var client = ESClient(hosts)
   client.indices.create({
-    'mappings': {
+    'mapping': {
       'snippet': {
         'properties': {
           'cprojectID': {'type': 'string'},

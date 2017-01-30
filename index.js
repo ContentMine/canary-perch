@@ -5,6 +5,7 @@ var path = require('path')
 var fs = 'graceful-fs'
 var AgentKeepAlive = require('agentkeepalive')
 var Elasticdump = require('elasticdump')
+var debug = require('debug')('canary-perch:index')
 
 // =====================================================================================
 // FUNCTIONS TO GET CONTENT INTO THE INDEX
@@ -220,9 +221,50 @@ var mapMetadataIndex = function (err, hosts, cb) {
   var metadataMapping = require('metadataMap.json')
   client.indices.create({
     index: 'facts',
-    mapping: metadataMapping
+    body: {
+      mappings: metadataMapping
+    }
   }
 , cb)
+}
+
+var deleteAndMapUnstructuredPaperIndex = function (err, hosts, index, cb) {
+  debug('deleting papers from hosts:' + hosts + ' and index:' + index)
+  if (err) throw err
+  var boundMapUnstructuredPaperIndex = function (err) {
+    mapUnstructuredPaperIndex(err, hosts, index, cb)
+  }
+  deleteUnstructuredPaperIndex(undefined, hosts, index, boundMapUnstructuredPaperIndex)
+}
+
+var deleteUnstructuredPaperIndex = function (err, hosts, index, cb) {
+  if (err) throw err
+  var client = ESClient(hosts)
+  function callback (err) {
+    if ((err) && !(err.status === 404)) throw err
+    cb()
+  }
+  client.indices.delete({index: index}, callback)
+}
+
+var mapUnstructuredPaperIndex = function (err, hosts, index, cb) {
+  if (err) throw err
+  var client = ESClient(hosts)
+  client.indices.create({
+    index: index,
+    body: {
+      'mappings': {
+        'unstructured': {
+          'properties': {
+            'cprojectID': {'type': 'string'},
+            'fulltext': {
+              'type': 'string', 'term_vector': 'with_positions_offsets_payloads'
+            }
+          }
+        }
+      }
+    }
+  }, cb)
 }
 
 var dump = function (hosts, directory) {
@@ -265,6 +307,7 @@ module.exports.ESClient = ESClient
 module.exports.dump = dump
 module.exports.deleteAndMapFactIndex = deleteAndMapFactIndex
 module.exports.deleteAndMapMetadataIndex = deleteAndMapMetadataIndex
+module.exports.deleteAndMapUnstructuredPaperIndex = deleteAndMapUnstructuredPaperIndex
 module.exports.indexCRMetadata = indexCRMetadata
 module.exports.indexEuPMCMetadata = indexEuPMCMetadata
 module.exports.loadCRHTMLFullTexts = loadCRHTMLFullTexts

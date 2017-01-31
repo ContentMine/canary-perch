@@ -1,8 +1,8 @@
 var recursive = require('recursive-readdir')
 var elasticsearch = require('elasticsearch')
-var _ = 'lodash'
+var _ = require('lodash')
 var path = require('path')
-var fs = 'graceful-fs'
+var fs = require('graceful-fs')
 var AgentKeepAlive = require('agentkeepalive')
 var Elasticdump = require('elasticdump')
 var debug = require('debug')('canary-perch:index')
@@ -46,7 +46,7 @@ var uploadJSONFileToES = function (file, index, type, client, cprojectID, cb) {
 var uploadXMLFileToES = function (file, index, type, client, cprojectID, cb) {
   fs.readFile(file, function (err, data) {
     if (err) throw err
-    client.create({
+    client.index({
       index: index,
       type: type,
       body: {
@@ -57,11 +57,15 @@ var uploadXMLFileToES = function (file, index, type, client, cprojectID, cb) {
   })
 }
 
-var loadEuPMCFullTexts = function (folder, hosts, cb) {
+var loadEuPMCFullTexts = function (folder, hosts, index, cb) {
   var client = ESClient(hosts)
   console.log('reading fulltexts from disk')
   recursive(folder, function (err, files) {
     if (err) throw err
+    var errorWrappingDone = function (err) {
+      if (err) throw err
+      done()
+    }
     var done = _.after(files.length, function () {
       cb()
       console.log('done all loading of files')
@@ -70,7 +74,7 @@ var loadEuPMCFullTexts = function (folder, hosts, cb) {
       if (path.basename(file) === 'fulltext.xml') {
         var cprojectID = path.basename(path.dirname(file))
         // console.log("uploading fulltext from CProject: " + cprojectID)
-        uploadXMLFileToES(file, 'fulltext', 'unstructured', client, cprojectID, done)
+        uploadXMLFileToES(file, index, 'unstructured', client, cprojectID, errorWrappingDone)
       } else {
         done()
       }
@@ -112,7 +116,7 @@ var loadCRFullTexts = function (folder, filename, hosts, cb) {
   })
 }
 
-var indexEuPMCMetadata = function (folder, hosts) {
+var indexEuPMCMetadata = function (folder, hosts, index) {
   var client = ESClient(hosts)
   console.log(folder)
   recursive(folder, function (err, files) {
@@ -121,7 +125,7 @@ var indexEuPMCMetadata = function (folder, hosts) {
       if (path.basename(file) === 'eupmc_result.json') {
         var cprojectID = path.basename(path.dirname(file))
         // console.log("Uploading file with cprojectID: " + cprojectID)
-        uploadJSONFileToES(file, 'metadata', 'eupmc', client, cprojectID, errorPrintingCB)
+        uploadJSONFileToES(file, index, 'eupmc', client, cprojectID, errorPrintingCB)
       }
     })
   })

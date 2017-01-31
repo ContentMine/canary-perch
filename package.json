@@ -2,7 +2,7 @@
   "name": "canary-perch",
   "version": "0.0.1",
   "description": "Elasticsearch Academic paper fact extraction - backend for canary",
-  "main": "index.js",
+  "main": "entrypoint.js",
   "dependencies": {
     "agentkeepalive": "^3.0.0",
     "debug": "^2.6.0",

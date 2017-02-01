@@ -60,7 +60,7 @@ extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client)
   var Extractor = this
   client.search({
     index: Extractor.inputIndex,
-    type: Extractor.outputType,
+    type: Extractor.inputType,
     body: {
       _source: false,
       fields: ['cprojectID'],

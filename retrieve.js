@@ -1,5 +1,5 @@
-import fs from 'fs'
-import execSync from 'child_process'
+var fs = require('fs')
+var execSync = require('child_process').execSync
 
 var getPapers = function (searchstr, dailyset, storedir) {
   // TODO update this to call the latest version of getpapers, and to call it with the query

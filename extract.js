@@ -4,24 +4,26 @@ var recursive = require('recursive-readdir')
 var Entities = require('html-entities').XmlEntities
 var entities = new Entities()
 var _ = require('lodash')
+var debug = require('debug')('canary-perch:extract')
+
 
 var numberOfFiles
 var finished
 
-var extractor = function (hosts, inputIndex, outputIndex, inputType, outputType, dictsDir) {
+var extractor = function (hosts, inputIndex, outputIndex, inputType, outputType, dictDir) {
   this.hosts = hosts
   this.inputIndex = inputIndex
   this.outputIndex = outputIndex
   this.inputType = inputType
   this.outputType = outputType
-  this.dictsDir = dictsDir
+  this.dictDir = dictDir
 }
 
 extractor.prototype.readDictionaries = function () {
   var Extractor = this
-  var folder = Extractor.dictsDir + '/json/'
+  var folder = Extractor.dictDir + '/json/'
   var client = index.ESClient(Extractor.hosts)
-  console.log('starting extraction')
+  debug('starting extractions with dictionaries from: ' + folder)
   recursive(folder, function (err, files) {
     if (err) throw err
     numberOfFiles = files.length

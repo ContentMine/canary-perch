@@ -44,6 +44,7 @@ extractor.prototype.readDictionaries = function () {
 // run again with the first entry removed and repeate until empty
 extractor.prototype.dictionaryQuery = function (dictionary, client) {
   var Extractor = this
+  debug('extracting from dictionary: ' + dictionary.id)
   setTimeout(function () {
     if (dictionary.entries.length) {
       var entry = dictionary.entries.shift()
@@ -57,6 +58,7 @@ extractor.prototype.dictionaryQuery = function (dictionary, client) {
 }
 
 extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client) {
+  debug('searching for term: ' + entry.term)
   var Extractor = this
   client.search({
     index: Extractor.inputIndex,
@@ -81,13 +83,14 @@ extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client)
       console.log(error)
     }
     if (!error) {
+      debug('response: ' + JSON.stringify(response))
       if (response.hits.hits.length === 0) {
-        Extractor.dictionaryQuery(dictionary, undefined, client)
+        Extractor.dictionaryQuery.bind(Extractor, dictionary, undefined, client)
       } else {
         for (var j = 0; j < response.hits.hits.length; j++) {
           Extractor.uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
         }
-        Extractor.dictionaryQuery(dictionary, undefined, client)
+        Extractor.dictionaryQuery.bind(Extractor, dictionary, undefined, client)
       }
     }
   })
@@ -122,7 +125,7 @@ extractor.prototype.uploadOneDocFacts = function (oneDocFacts, dictionary, entry
 extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
   var Extractor = this
   // console.log("uploading one fact")
-  client.create({
+  client.index({
     index: Extractor.outputIndex,
     type: Extractor.outputType,
     body: {

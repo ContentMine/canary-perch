@@ -44,17 +44,15 @@ extractor.prototype.readDictionaries = function () {
 // run again with the first entry removed and repeate until empty
 extractor.prototype.dictionaryQuery = function (dictionary, client) {
   var Extractor = this
-  debug('extracting from dictionary: ' + dictionary.id)
-  setTimeout(function () {
-    if (dictionary.entries.length) {
-      var entry = dictionary.entries.shift()
-      Extractor.dictionarySingleQuery(entry, dictionary, client)
-    } else {
-      console.log('finished extraction')
-      finished()
-      return
-    }
-  }, 0)
+  debug('extracting ' + dictionary.entries.length + ' entries from dictionary: ' + dictionary.id)
+  if (dictionary.entries.length) {
+    var entry = dictionary.entries.shift()
+    Extractor.dictionarySingleQuery(entry, dictionary, client)
+  } else {
+    console.log('finished extraction')
+    finished()
+    return
+  }
 }
 
 extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client) {
@@ -85,12 +83,13 @@ extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client)
     if (!error) {
       debug('response: ' + JSON.stringify(response))
       if (response.hits.hits.length === 0) {
-        Extractor.dictionaryQuery.bind(Extractor, dictionary, undefined, client)
+        Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
       } else {
         for (var j = 0; j < response.hits.hits.length; j++) {
           Extractor.uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
         }
-        Extractor.dictionaryQuery.bind(Extractor, dictionary, undefined, client)
+
+        Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
       }
     }
   })

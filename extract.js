@@ -44,7 +44,6 @@ extractor.prototype.readDictionaries = function () {
 // run again with the first entry removed and repeate until empty
 extractor.prototype.dictionaryQuery = function (dictionary, client) {
   var Extractor = this
-  debug('extracting ' + dictionary.entries.length + ' entries from dictionary: ' + dictionary.id)
   if (dictionary.entries.length) {
     var entry = dictionary.entries.shift()
     Extractor.dictionarySingleQuery(entry, dictionary, client)
@@ -55,12 +54,30 @@ extractor.prototype.dictionaryQuery = function (dictionary, client) {
   }
 }
 
+extractor.prototype.handleDictionarySingleQueryResponse = function (error, response) {
+  if (error) {
+    console.log(error)
+  }
+  if (!error) {
+    if (response.hits.hits.length === 0) {
+      Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
+    } else {
+      debug('got back' + response.hits.hits.length + 'hits searching for term: ' + entry.term)
+      for (var j = 0; j < response.hits.hits.length; j++) {
+        Extractor.uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
+      }
+
+      Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
+    }
+  }
+}
+
 extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client) {
-  debug('searching for term: ' + entry.term)
+  //debug('searching for term: ' + entry.term)
   var Extractor = this
   client.search({
     index: Extractor.inputIndex,
-    type: Extractor.inputType,
+    //type: Extractor.inputType,
     body: {
       _source: false,
       fields: ['cprojectID'],
@@ -76,23 +93,7 @@ extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client)
         }
       }
     }
-  }, function (error, response) {
-    if (error) {
-      console.log(error)
-    }
-    if (!error) {
-      debug('response: ' + JSON.stringify(response))
-      if (response.hits.hits.length === 0) {
-        Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
-      } else {
-        for (var j = 0; j < response.hits.hits.length; j++) {
-          Extractor.uploadOneDocFacts(response.hits.hits[j], dictionary, entry, client)
-        }
-
-        Extractor.dictionaryQuery.bind(Extractor, dictionary, client)()
-      }
-    }
-  })
+  }, Extractor.handleDictionarySingleQueryResponse.bind(Extractor))
 }
 
 // insert all the facts from one document as returned by ES

@@ -54,7 +54,8 @@ extractor.prototype.dictionaryQuery = function (dictionary, client) {
   }
 }
 
-extractor.prototype.handleDictionarySingleQueryResponse = function (error, response) {
+extractor.prototype.handleDictionarySingleQueryResponse = function (error, response, dictionary, client) {
+  var Extractor = this
   if (error) {
     console.log(error)
   }
@@ -125,6 +126,7 @@ extractor.prototype.uploadOneDocFacts = function (oneDocFacts, dictionary, entry
 extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
   var Extractor = this
   // console.log("uploading one fact")
+  var d = new Date()
   client.index({
     index: Extractor.outputIndex,
     type: Extractor.outputType,
@@ -134,7 +136,8 @@ extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
       'term': fact.term,
       'documentID': fact.docId,
       'cprojectID': fact.cprojectID,
-      'identifiers': entry.identifiers
+      'identifiers': entry.identifiers,
+      'ingestionDate:': d.toJSON()
     }
   }, function (err) {
     if (err) console.log(err)

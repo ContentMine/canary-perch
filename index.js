@@ -146,7 +146,7 @@ var indexCRMetadata = function (folder, hosts) {
   })
 }
 
-var deleteFactIndex = function (err, hosts, cb) {
+var deleteFactIndex = function (err, hosts, index, cb) {
   if (err) throw err
   var client = ESClient(hosts)
   // Use dummy callback to wedge in hosts
@@ -155,11 +155,11 @@ var deleteFactIndex = function (err, hosts, cb) {
     cb(undefined, hosts, cb)
   }
   client.indices.delete({
-    index: 'facts'
+    index: index
   }, dummyCallback)
 }
 
-var mapFactIndex = function (err, hosts, cb) {
+var mapFactIndex = function (err, hosts, index, cb) {
   if ((err) && !(err.status === 404)) {
     console.log(err)
     throw err
@@ -185,13 +185,16 @@ var mapFactIndex = function (err, hosts, cb) {
         }
       }
     },
-    index: 'facts'
+    index: index
   }, cb)
 }
 
-var deleteAndMapFactIndex = function (err, hosts, cb) {
+var deleteAndMapFactIndex = function (err, hosts, index, cb) {
   if (err) throw err
-  deleteFactIndex(undefined, hosts, mapFactIndex)
+  var dummyCallback = function () {
+    mapFactIndex(undefined, hosts, index, cb)
+  }
+  deleteFactIndex(undefined, hosts, index, dummyCallback)
 }
 
 var deleteAndMapMetadataIndex = function (err, hosts, cb) {

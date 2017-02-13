@@ -71,6 +71,7 @@ var loadEuPMCFullTexts = function (folder, hosts, index, cb) {
       cb()
       console.log('done all loading of files')
     })
+    debug('list of files to consider: ' + files)
     files.forEach(function (file) {
       if (path.basename(file) === 'fulltext.xml') {
         var cprojectID = path.basename(path.dirname(file))

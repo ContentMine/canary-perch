@@ -210,7 +210,7 @@ var deleteMetadataIndex = function (err, hosts, cb) {
   var dummyCallback = function (err) {
     if (err) throw err
     if (Meteor) {
-      Meteor.bindEnvironment(() => cb(err, hosts))
+      Meteor.bindEnvironment(function () { cb(err, hosts) })
     }
     cb(err, hosts)
   }

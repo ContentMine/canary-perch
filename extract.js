@@ -6,7 +6,6 @@ var entities = new Entities()
 var _ = require('lodash')
 var debug = require('debug')('canary-perch:extract')
 
-
 var numberOfFiles
 var finished
 
@@ -58,7 +57,7 @@ extractor.prototype.dictionaryQuery = function (dictionary, client) {
   }
 }
 
-extractor.prototype.handleDictionarySingleQueryResponse = function (error, response, dictionary, client) {
+extractor.prototype.handleDictionarySingleQueryResponse = function (error, response, dictionary, entry, client) {
   var Extractor = this
   if (error) {
     console.log(error)
@@ -78,11 +77,12 @@ extractor.prototype.handleDictionarySingleQueryResponse = function (error, respo
 }
 
 extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client) {
-  //debug('searching for term: ' + entry.term)
   var Extractor = this
+  var callBacker = function (error, response) {
+    Extractor.handleDictionarySingleQueryResponse.bind(Extractor, error, response, dictionary, entry, client)()
+  }
   client.search({
     index: Extractor.inputIndex,
-    //type: Extractor.inputType,
     body: {
       _source: false,
       fields: ['cprojectID'],
@@ -98,7 +98,7 @@ extractor.prototype.dictionarySingleQuery = function (entry, dictionary, client)
         }
       }
     }
-  }, Extractor.handleDictionarySingleQueryResponse.bind(Extractor))
+  }, callBacker)
 }
 
 // insert all the facts from one document as returned by ES

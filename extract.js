@@ -44,11 +44,15 @@ extractor.prototype.readDictionaries = function () {
 // run again with the first entry removed and repeate until empty
 extractor.prototype.dictionaryQuery = function (dictionary, client) {
   var Extractor = this
+  if (!dictionary.entries) {
+    debug('Malformed Dictionary: ' + dictionary)
+    return
+  }
   if (dictionary.entries.length) {
     var entry = dictionary.entries.shift()
     Extractor.dictionarySingleQuery(entry, dictionary, client)
   } else {
-    console.log('finished extraction')
+    debug('finished extraction')
     finished()
     return
   }

@@ -20,11 +20,11 @@ bulkuploader.prototype.runUpload = function () {
     var batch = BulkUploader.queue.splice(0, 50)
     BulkUploader._upload(batch)
   } else if (BulkUploader.haltflag) {
-    console.log('halting uploader')
     if (BulkUploader.queue.length === 0) {
       return
     } else {
       BulkUploader._upload(BulkUploader.queue)
+      BulkUploader.queue = []
       return
     }
   } else {

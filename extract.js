@@ -5,6 +5,7 @@ var Entities = require('html-entities').XmlEntities
 var entities = new Entities()
 var _ = require('lodash')
 var debug = require('debug')('canary-perch:extract')
+var BulkUploader = require('./bulkupload')
 
 var numberOfFiles
 var finished
@@ -16,12 +17,15 @@ var extractor = function (hosts, inputIndex, outputIndex, inputType, outputType,
   this.inputType = inputType
   this.outputType = outputType
   this.dictDir = dictDir
+  this.client = index.ESClient(hosts)
+  this.uploader = new BulkUploader(this.client)
+  this.uploader.runUpload()
 }
 
 extractor.prototype.readDictionaries = function () {
   var Extractor = this
   var folder = Extractor.dictDir + '/json/'
-  var client = index.ESClient(Extractor.hosts)
+  var client = Extractor.client
   debug('starting extractions with dictionaries from: ' + folder)
   recursive(folder, function (err, files) {
     if (err) throw err
@@ -29,6 +33,7 @@ extractor.prototype.readDictionaries = function () {
     finished = _.after(numberOfFiles, () => {
       if (err) throw err
       console.log('all extractions finished')
+      Extractor.uploader.shutdown()
     })
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
@@ -131,7 +136,7 @@ extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
   var Extractor = this
   // console.log("uploading one fact")
   var d = new Date()
-  client.index({
+  Extractor.uploader.addUpload({
     index: Extractor.outputIndex,
     type: Extractor.outputType,
     body: {
@@ -143,8 +148,6 @@ extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
       'identifiers': entry.identifiers,
       'ingestionDate:': d.toJSON()
     }
-  }, function (err) {
-    if (err) console.log(err)
   })
 }
 

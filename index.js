@@ -14,12 +14,13 @@ var debug = require('debug')('canary-perch:index')
 var ESClient = function (hosts) {
   if (!hosts) throw new Error('no elastichost host')
   var client = new elasticsearch.Client({
-    // log: 'trace',
+    log: 'trace',
     apiVersion: '2.3',
     hosts: hosts,
     maxSockets: 20,
     maxRetries: 50,
     createNodeAgent: function (connection, config) {
+      console.log(config)
       return new AgentKeepAlive(connection.makeAgentConfig(config))
     }
   })
@@ -183,7 +184,8 @@ var mapFactIndex = function (err, hosts, index, cb) {
             },
             'post': {'type': 'string'},
             'prefix': {'type': 'string'},
-            'term': {'type': 'string'}
+            'term': {'type': 'string'},
+	    'ingestionDate': {'type' : 'date', 'format':'strict_date_optional_time||epoch_millis'}
           }
         }
       }

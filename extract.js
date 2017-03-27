@@ -146,7 +146,7 @@ extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
       'documentID': fact.docId,
       'cprojectID': fact.cprojectID,
       'identifiers': entry.identifiers,
-      'ingestionDate:': d.toJSON()
+      'ingestionDate': d.toJSON()
     }
   })
 }

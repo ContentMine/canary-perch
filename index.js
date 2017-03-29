@@ -14,7 +14,6 @@ var debug = require('debug')('canary-perch:index')
 var ESClient = function (hosts) {
   if (!hosts) throw new Error('no elastichost host')
   var client = new elasticsearch.Client({
-    log: 'trace',
     apiVersion: '2.3',
     hosts: hosts,
     maxSockets: 20,

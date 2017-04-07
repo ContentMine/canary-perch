@@ -1,23 +1,40 @@
-{}
-"mappings": {
-  "snippet": {
-    "properties": {
-      "dictionaryID": {
-        "type": "string"
-      },
-      "documentID": {
-        "type": "string"
-      },
-      "post": {
-        "type": "string"
-      },
-      "prefix": {
-        "type": "string"
-      },
-      "term": {
-        "type": "string"
+{"mappings": {
+      "snippet": {
+        "properties": {
+          "term": {
+              "type": "string",
+	      "index": "not_analyzed"
+          },
+          "post": {
+              "type": "string",
+	      "index": "not_analyzed"
+          },
+          "ingestionDate": {
+            "format": "strict_date_optional_time||epoch_millis",
+            "type": "date"
+          },
+          "identifiers": {
+            "properties": {
+              "wikidata": {
+                  "type": "string",
+		  "index": "not_analyzed"
+              },
+              "contentmine": {
+                  "type": "string",
+		  "index": "not_analyzed"
+              }
+            }
+          },
+          "documentID": {
+              "type": "string",
+	      "index": "not_analyzed"
+          },
+          "cprojectID": {
+              "type": "string",
+	      "index": "not_analyzed"
+          }
+        }
       }
     }
-  }
-}
-}
+ }
+

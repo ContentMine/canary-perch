@@ -6,6 +6,7 @@ var fs = require('graceful-fs')
 var AgentKeepAlive = require('agentkeepalive')
 var Elasticdump = require('elasticdump')
 var debug = require('debug')('canary-perch:index')
+var factIndexMapping = require('./snippetfacts-mapping.json')
 
 // =====================================================================================
 // FUNCTIONS TO GET CONTENT INTO THE INDEX
@@ -169,26 +170,7 @@ var mapFactIndex = function (err, hosts, index, cb) {
   }
   var client = ESClient(hosts)
   client.indices.create({
-    body: {
-      'mappings': {
-        'snippet': {
-          'properties': {
-            'cprojectID': {'type': 'string'},
-            'documentID': {'type': 'string'},
-            'identifiers': {
-              'properties': {
-                'contentmine': {'type': 'string'},
-                'opentrials': {'type': 'string'}
-              }
-            },
-            'post': {'type': 'string'},
-            'prefix': {'type': 'string'},
-            'term': {'type': 'string'},
-	    'ingestionDate': {'type' : 'date', 'format':'strict_date_optional_time||epoch_millis'}
-          }
-        }
-      }
-    },
+    body: factIndexMapping,
     index: index
   }, cb)
 }

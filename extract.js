@@ -6,6 +6,7 @@ var entities = new Entities()
 var _ = require('lodash')
 var debug = require('debug')('canary-perch:extract')
 var BulkUploader = require('./bulkupload')
+var cprocess = require('child_process')
 
 var numberOfFiles
 var finished
@@ -26,6 +27,8 @@ extractor.prototype.readDictionaries = function () {
   var Extractor = this
   var folder = Extractor.dictDir + '/json/'
   var client = Extractor.client
+  Extractor.dictHash = cprocess.execSync('git -C ' + folder + ' rev-parse HEAD', {encoding: 'utf8'}).trim()
+  console.log(Extractor.dictHash)
   debug('starting extractions with dictionaries from: ' + folder)
   recursive(folder, function (err, files) {
     if (err) throw err
@@ -146,7 +149,8 @@ extractor.prototype.uploadOneFact = function (fact, dictionary, entry, client) {
       'documentID': fact.docId,
       'cprojectID': fact.cprojectID,
       'identifiers': entry.identifiers,
-      'ingestionDate': d.toJSON()
+      'ingestionDate': d.toJSON(),
+      'dictionaryHash': Extractor.dictHash
     }
   })
 }

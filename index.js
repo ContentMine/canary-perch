@@ -20,7 +20,6 @@ var ESClient = function (hosts) {
     maxSockets: 20,
     maxRetries: 50,
     createNodeAgent: function (connection, config) {
-      console.log(config)
       return new AgentKeepAlive(connection.makeAgentConfig(config))
     }
   })

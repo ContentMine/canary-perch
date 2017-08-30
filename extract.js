@@ -23,11 +23,16 @@ var extractor = function (hosts, inputIndex, outputIndex, inputType, outputType,
   this.uploader.runUpload()
 }
 
-extractor.prototype.readDictionaries = function () {
+extractor.prototype.setDictHash = function (folder) {
+  var Extractor = this
+  Extractor.dictHash = cprocess.execSync('git -C ' + folder + ' rev-parse HEAD', {encoding: 'utf8'}).trim()
+}
+
+extractor.prototype.readDictionaries = function (dictionaryWhitelist) {
   var Extractor = this
   var folder = Extractor.dictDir + '/json/'
   var client = Extractor.client
-  Extractor.dictHash = cprocess.execSync('git -C ' + folder + ' rev-parse HEAD', {encoding: 'utf8'}).trim()
+  Extractor.setDictHash(folder)
   console.log(Extractor.dictHash)
   debug('starting extractions with dictionaries from: ' + folder)
   recursive(folder, function (err, files) {
@@ -41,7 +46,13 @@ extractor.prototype.readDictionaries = function () {
     files.forEach(function (file) {
       fs.readFile(file, 'utf8', function (err, data) {
         if (err) throw err
-        Extractor.dictionaryQuery(JSON.parse(data), client)
+        if (!(dictionaryWhitelist)) {
+          Extractor.dictionaryQuery(JSON.parse(data), client)
+        } else {
+          if (dictionaryWhitelist.find(data.id)) {
+            Extractor.dictionaryQuery(JSON.parse(data), client)
+          }
+        }
       })
     })
   })

@@ -49,7 +49,7 @@ extractor.prototype.readDictionaries = function (dictionaryWhitelist) {
         if (!(dictionaryWhitelist)) {
           Extractor.dictionaryQuery(JSON.parse(data), client)
         } else {
-          if (dictionaryWhitelist.find(data.id)) {
+          if (dictionaryWhitelist.includes(data.id)) {
             Extractor.dictionaryQuery(JSON.parse(data), client)
           } else {
             finished()

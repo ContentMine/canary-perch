@@ -51,6 +51,8 @@ extractor.prototype.readDictionaries = function (dictionaryWhitelist) {
         } else {
           if (dictionaryWhitelist.find(data.id)) {
             Extractor.dictionaryQuery(JSON.parse(data), client)
+          } else {
+            finished()
           }
         }
       })
